@@ -1,0 +1,516 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  color: #18212f;
+  background: #f3f6f8;
+  --primario: #145da0;
+  --primario-oscuro: #0f477c;
+  --acento: #d97706;
+  --texto-suave: #586575;
+  --borde: #d8e0e8;
+  --superficie: #ffffff;
+  --error: #b42318;
+  --exito: #08783e;
+  --sombra: 0 12px 32px rgb(24 33 47 / 8%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.cabecera {
+  padding: 3.5rem 0 4.5rem;
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 80% 10%, rgb(255 255 255 / 16%), transparent 25rem),
+    linear-gradient(120deg, #0e416f, #1976b9);
+}
+
+.cabecera h1 {
+  margin: 0;
+  max-width: 720px;
+  font-size: clamp(2.25rem, 7vw, 4.75rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.cabecera p:last-child {
+  max-width: 600px;
+  margin-bottom: 0;
+  color: #dcecf7;
+  font-size: 1.1rem;
+}
+
+.contenedor {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+.distribucion {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+  gap: 1.25rem;
+  margin-top: -2.25rem;
+  padding-bottom: 3rem;
+}
+
+.panel {
+  min-width: 0;
+  padding: 1.5rem;
+  border: 1px solid rgb(216 224 232 / 85%);
+  border-radius: 1rem;
+  background: var(--superficie);
+  box-shadow: var(--sombra);
+}
+
+.panel-catalogo {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+
+.panel-carrito {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.panel-pedido {
+  grid-column: 2;
+  grid-row: 2 / span 2;
+}
+
+.panel-historial {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.encabezado-seccion,
+.etiqueta-contador,
+.barra-historial {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.encabezado-seccion {
+  margin-bottom: 1.25rem;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--primario);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cabecera .eyebrow {
+  color: #bde3ff;
+}
+
+.insignia,
+.stock {
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: #e9f2fa;
+  color: #14517f;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.stock.agotado {
+  background: #feeceb;
+  color: var(--error);
+}
+
+.filtros,
+#formulario-pedido {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.filtros {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: #f4f7fa;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.campo-completo {
+  grid-column: 1 / -1;
+}
+
+label,
+legend {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #b9c5d1;
+  border-radius: 0.5rem;
+  color: inherit;
+  background: #ffffff;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible,
+summary:focus-visible {
+  outline: 3px solid rgb(20 93 160 / 22%);
+  outline-offset: 2px;
+  border-color: var(--primario);
+}
+
+input:disabled {
+  background: #eef2f5;
+}
+
+textarea {
+  resize: vertical;
+}
+
+fieldset {
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid var(--borde);
+  border-radius: 0.75rem;
+}
+
+.opciones-radio {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.opciones-radio label,
+.campo-aceptacion label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.opciones-radio input,
+.campo-aceptacion input {
+  width: auto;
+  margin: 0;
+}
+
+.campos-envio {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(140px, 1fr);
+  gap: 1rem;
+}
+
+.campos-envio[hidden] {
+  display: none;
+}
+
+.rejilla-productos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.tarjeta-producto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--borde);
+  border-radius: 0.8rem;
+}
+
+.tarjeta-producto h3 {
+  margin: 0.65rem 0 0.25rem;
+}
+
+.categoria-producto,
+.precio-producto,
+.datos-linea,
+small {
+  color: var(--texto-suave);
+}
+
+.categoria-producto {
+  margin: 0;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.precio-producto {
+  margin: auto 0 1rem;
+  color: var(--primario-oscuro);
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.form-anadir {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 0.5rem;
+  align-items: end;
+}
+
+.form-anadir input {
+  min-width: 0;
+}
+
+.boton {
+  padding: 0.72rem 0.9rem;
+  border: 0;
+  border-radius: 0.55rem;
+  font-weight: 750;
+  transition:
+    transform 120ms ease,
+    background 120ms ease;
+}
+
+.boton:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.boton-principal {
+  color: #ffffff;
+  background: var(--primario);
+}
+
+.boton-principal:hover:not(:disabled) {
+  background: var(--primario-oscuro);
+}
+
+.boton-secundario {
+  border: 1px solid var(--borde);
+  color: var(--primario-oscuro);
+  background: #f5f9fc;
+}
+
+.boton-peligro {
+  width: auto;
+  padding: 0.45rem 0.65rem;
+  color: var(--error);
+  background: #fff1f0;
+}
+
+.boton:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.lista-carrito {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.linea-carrito,
+.pedido {
+  padding: 0.9rem;
+  border: 1px solid var(--borde);
+  border-radius: 0.7rem;
+}
+
+.cabecera-linea {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cabecera-linea h3,
+.pedido h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.datos-linea {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+}
+
+.resumen-importes {
+  margin: 1.25rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--borde);
+}
+
+.resumen-importes div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.35rem 0;
+}
+
+.resumen-importes dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.importe-total {
+  margin-top: 0.4rem;
+  padding-top: 0.75rem !important;
+  border-top: 1px dashed var(--borde);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.mensaje-estado {
+  padding: 0.85rem;
+  border-radius: 0.65rem;
+  color: var(--texto-suave);
+  background: #f4f7fa;
+  text-align: center;
+}
+
+.mensaje-estado[hidden] {
+  display: none;
+}
+
+.error-campo {
+  min-height: 1rem;
+  color: var(--error);
+  font-weight: 600;
+}
+
+[aria-invalid="true"] {
+  border-color: var(--error);
+  box-shadow: 0 0 0 2px rgb(180 35 24 / 10%);
+}
+
+.aviso-error,
+.aviso-exito {
+  margin: 0;
+  padding: 0.8rem;
+  border-radius: 0.6rem;
+}
+
+.aviso-error {
+  color: var(--error);
+  background: #fff1f0;
+}
+
+.aviso-exito {
+  color: var(--exito);
+  background: #eafaf1;
+}
+
+.barra-historial {
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+
+.barra-historial p {
+  margin: 0 0 0.2rem;
+  font-weight: 700;
+}
+
+.lista-pedidos {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.pedido details {
+  margin-top: 0.75rem;
+}
+
+.pedido summary {
+  color: var(--primario);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pedido ul {
+  margin-bottom: 0;
+  padding-left: 1.25rem;
+}
+
+.campo-exportacion {
+  margin-top: 1rem;
+}
+
+footer {
+  padding: 1.5rem;
+  color: #dcecf7;
+  background: #132c45;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .distribucion {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-catalogo,
+  .panel-carrito,
+  .panel-pedido,
+  .panel-historial {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+@media (max-width: 620px) {
+  .contenedor {
+    width: min(100% - 1rem, 1180px);
+  }
+
+  .cabecera {
+    padding: 2.5rem 0 3.75rem;
+  }
+
+  .panel {
+    padding: 1rem;
+  }
+
+  .filtros,
+  #formulario-pedido,
+  .campos-envio,
+  .rejilla-productos {
+    grid-template-columns: 1fr;
+  }
+
+  .encabezado-seccion,
+  .barra-historial {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .form-anadir {
+    grid-template-columns: minmax(74px, 90px) 1fr;
+  }
+}

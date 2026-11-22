@@ -1,13 +1,246 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor Pedidos</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="js/main.js" defer type="module"></script>
-</head>
-<body>
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Catálogo, carrito e historial para pedidos de material informático y de oficina."
+    />
+    <title>Gestor de pedidos de material</title>
+    <link rel="stylesheet" href="css/estilos.css" />
+    <script src="js/app.js" defer type="module"></script>
+  </head>
+  <body>
+    <header class="cabecera">
+      <div class="contenedor">
+        <p class="eyebrow">Desarrollo Web en Entorno Cliente</p>
+        <h1>Gestor de pedidos</h1>
+        <p>Consulta el catálogo, prepara tu carrito y confirma el pedido.</p>
+      </div>
+    </header>
 
-</body>
+    <main class="contenedor distribucion">
+      <section class="panel panel-catalogo" aria-labelledby="titulo-catalogo">
+        <div class="encabezado-seccion">
+          <div>
+            <p class="eyebrow">Catálogo</p>
+            <h2 id="titulo-catalogo">Material disponible</h2>
+          </div>
+          <span class="insignia" id="contador-catalogo">0 productos</span>
+        </div>
+
+        <div class="filtros" role="search">
+          <div class="campo">
+            <label for="busqueda">Buscar por nombre</label>
+            <input
+              id="busqueda"
+              type="search"
+              placeholder="Ej. teclado"
+              autocomplete="off"
+            />
+          </div>
+          <div class="campo">
+            <label for="filtro-categoria">Categoría</label>
+            <select id="filtro-categoria">
+              <option value="todas">Todas las categorías</option>
+            </select>
+          </div>
+        </div>
+
+        <p class="mensaje-estado" id="estado-catalogo" hidden></p>
+        <div class="rejilla-productos" id="catalogo"></div>
+      </section>
+
+      <aside class="panel panel-carrito" aria-labelledby="titulo-carrito">
+        <div class="encabezado-seccion">
+          <div>
+            <p class="eyebrow">Resumen</p>
+            <h2 id="titulo-carrito">Tu carrito</h2>
+          </div>
+          <span class="insignia" id="total-unidades">0 uds.</span>
+        </div>
+
+        <p class="mensaje-estado" id="estado-carrito"></p>
+        <div id="lineas-carrito" class="lista-carrito"></div>
+
+        <dl class="resumen-importes">
+          <div>
+            <dt>Subtotal</dt>
+            <dd id="subtotal-carrito">0,00 €</dd>
+          </div>
+          <div>
+            <dt>Descuento (10 % desde 100 €)</dt>
+            <dd id="descuento-carrito">0,00 €</dd>
+          </div>
+          <div class="importe-total">
+            <dt>Total</dt>
+            <dd id="total-carrito">0,00 €</dd>
+          </div>
+        </dl>
+      </aside>
+
+      <section class="panel panel-pedido" aria-labelledby="titulo-pedido">
+        <div class="encabezado-seccion">
+          <div>
+            <p class="eyebrow">Datos de entrega</p>
+            <h2 id="titulo-pedido">Confirmar pedido</h2>
+          </div>
+        </div>
+
+        <form id="formulario-pedido" novalidate>
+          <div class="campo campo-completo">
+            <label for="nombre">Nombre y apellidos</label>
+            <input
+              id="nombre"
+              name="nombre"
+              type="text"
+              required
+              minlength="2"
+              maxlength="60"
+              autocomplete="name"
+              aria-describedby="nombre-error"
+            />
+            <small class="error-campo" id="nombre-error"></small>
+          </div>
+
+          <div class="campo campo-completo">
+            <label for="email">Correo electrónico</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              autocomplete="email"
+              aria-describedby="email-ayuda email-error"
+            />
+            <small id="email-ayuda">Solo comprobamos el formato, no la existencia de la cuenta.</small>
+            <small class="error-campo" id="email-error"></small>
+          </div>
+
+          <fieldset class="campo-completo">
+            <legend>Modalidad de entrega</legend>
+            <div class="opciones-radio">
+              <label>
+                <input type="radio" name="modalidad" value="recogida" required />
+                Recogida en tienda
+              </label>
+              <label>
+                <input type="radio" name="modalidad" value="envio" required />
+                Envío a domicilio
+              </label>
+            </div>
+            <small class="error-campo" id="modalidad-error"></small>
+          </fieldset>
+
+          <div id="campos-envio" class="campos-envio campo-completo" hidden>
+            <div class="campo">
+              <label for="direccion">Dirección de envío</label>
+              <input
+                id="direccion"
+                name="direccion"
+                type="text"
+                minlength="5"
+                maxlength="100"
+                autocomplete="street-address"
+                aria-describedby="direccion-error"
+                disabled
+              />
+              <small class="error-campo" id="direccion-error"></small>
+            </div>
+            <div class="campo">
+              <label for="codigo-postal">Código postal</label>
+              <input
+                id="codigo-postal"
+                name="codigoPostal"
+                type="text"
+                inputmode="numeric"
+                pattern="(?:(?:0[1-9]|[1-4][0-9]|5[0-2])[0-9]{3})"
+                maxlength="5"
+                autocomplete="postal-code"
+                aria-describedby="codigo-postal-ayuda codigo-postal-error"
+                disabled
+              />
+              <small id="codigo-postal-ayuda">Cinco cifras, de la provincia 01 a la 52.</small>
+              <small class="error-campo" id="codigo-postal-error"></small>
+            </div>
+          </div>
+
+          <div class="campo campo-completo">
+            <div class="etiqueta-contador">
+              <label for="observaciones">Observaciones</label>
+              <span id="contador-observaciones">0 / 200</span>
+            </div>
+            <textarea
+              id="observaciones"
+              name="observaciones"
+              maxlength="200"
+              rows="4"
+              placeholder="Indicaciones opcionales"
+              aria-describedby="observaciones-error"
+            ></textarea>
+            <small class="error-campo" id="observaciones-error"></small>
+          </div>
+
+          <div class="campo-aceptacion campo-completo">
+            <label>
+              <input
+                id="aceptacion"
+                name="aceptacion"
+                type="checkbox"
+                required
+                aria-describedby="aceptacion-error"
+              />
+              Confirmo que los datos del pedido son correctos.
+            </label>
+            <small class="error-campo" id="aceptacion-error"></small>
+          </div>
+
+          <p id="error-pedido" class="aviso-error campo-completo" role="alert" hidden></p>
+          <p id="mensaje-pedido" class="aviso-exito campo-completo" role="status" hidden></p>
+
+          <button class="boton boton-principal campo-completo" id="confirmar-pedido" type="submit">
+            Confirmar pedido
+          </button>
+        </form>
+      </section>
+
+      <section class="panel panel-historial" aria-labelledby="titulo-historial">
+        <div class="encabezado-seccion">
+          <div>
+            <p class="eyebrow">Pedidos confirmados</p>
+            <h2 id="titulo-historial">Historial</h2>
+          </div>
+          <button class="boton boton-secundario" id="exportar-historial" type="button">
+            Exportar historial
+          </button>
+        </div>
+
+        <div class="barra-historial">
+          <div class="campo">
+            <label for="filtro-historial">Mostrar modalidad</label>
+            <select id="filtro-historial">
+              <option value="todas">Todas</option>
+              <option value="recogida">Recogida</option>
+              <option value="envio">Envío</option>
+            </select>
+          </div>
+          <p id="resumen-historial" aria-live="polite">0 pedidos · 0,00 €</p>
+        </div>
+
+        <p class="mensaje-estado" id="estado-historial"></p>
+        <div id="lista-pedidos" class="lista-pedidos"></div>
+
+        <div class="campo campo-exportacion" id="contenedor-exportacion" hidden>
+          <label for="json-historial">Historial en JSON</label>
+          <textarea id="json-historial" rows="8" readonly></textarea>
+          <button class="boton boton-secundario" id="copiar-json" type="button">Copiar JSON</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Práctica de integración · HTML, CSS y JavaScript sin persistencia</p>
+    </footer>
+  </body>
 </html>
