@@ -1,4 +1,6 @@
 // Estas funciones solo reciben datos y devuelven números u objetos. No conocen el DOM.
+// Gracias a ello pueden probarse desde la consola sin depender de botones o etiquetas.
+// El subtotal localiza cada producto por id; la posición en el array sería insegura.
 export function calcularSubtotal(lineas, catalogo) {
   return lineas.reduce((acumulado, linea) => {
     const producto = catalogo.find((item) => item.id === linea.productoId);
@@ -11,14 +13,17 @@ export function calcularSubtotal(lineas, catalogo) {
   }, 0);
 }
 
+// El 10 es un parámetro por defecto: puede omitirse, pero también permite probar otros porcentajes.
 export function calcularDescuento(subtotal, porcentaje = 10) {
   if (!Number.isFinite(subtotal) || subtotal < 0 || !Number.isFinite(porcentaje)) {
     throw new TypeError("Los valores para calcular el descuento no son válidos.");
   }
 
+  // El descuento se calcula con números. El redondeo visual se hace después.
   return subtotal >= 100 ? subtotal * (porcentaje / 100) : 0;
 }
 
+// Esta función mantiene por separado el cálculo final y facilita detectar importes incoherentes.
 export function calcularTotal(subtotal, descuento) {
   if (
     !Number.isFinite(subtotal) ||
@@ -33,7 +38,9 @@ export function calcularTotal(subtotal, descuento) {
   return subtotal - descuento;
 }
 
+// Devuelve un objeto con errores. No muestra mensajes ni cambia ningún control del formulario.
 export function validarDatosPedido(datos) {
+  // El trim elimina espacios exteriores para no aceptar un nombre compuesto solo por espacios.
   const errores = {};
   const nombre = typeof datos.nombre === "string" ? datos.nombre.trim() : "";
   const email = typeof datos.email === "string" ? datos.email.trim() : "";
@@ -43,7 +50,9 @@ export function validarDatosPedido(datos) {
     typeof datos.codigoPostal === "string" ? datos.codigoPostal.trim() : "";
   const observaciones =
     typeof datos.observaciones === "string" ? datos.observaciones : "";
+  // La expresión tiene alternativas agrupadas para aceptar provincias desde 01 hasta 52.
   const codigoPostalEspanol = /^(?:(?:0[1-9]|[1-4][0-9]|5[0-2])[0-9]{3})$/;
+  // Este formato comprueba la estructura habitual; no demuestra que el correo exista.
   const formatoEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (nombre.length < 2 || nombre.length > 60) {
@@ -58,6 +67,7 @@ export function validarDatosPedido(datos) {
     errores.modalidad = "Selecciona recogida o envío.";
   }
 
+  // Dirección y código postal solo se validan cuando el valor admitido es envío.
   if (modalidad === "envio") {
     if (direccion.length < 5 || direccion.length > 100) {
       errores.direccion = "La dirección debe tener entre 5 y 100 caracteres.";

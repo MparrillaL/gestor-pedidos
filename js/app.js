@@ -1,3 +1,4 @@
+// app.js conecta los datos y las funciones puras con los eventos del navegador.
 import { catalogo, carrito, pedidos } from "./datos.js";
 import {
   calcularDescuento,
@@ -12,6 +13,7 @@ import {
   pintarHistorial
 } from "./vista.js";
 
+// Guardar las referencias una sola vez evita repetir selectores en cada evento.
 const elementos = {
   busqueda: document.querySelector("#busqueda"),
   filtroCategoria: document.querySelector("#filtro-categoria"),
@@ -44,6 +46,8 @@ const elementos = {
   copiarJson: document.querySelector("#copiar-json")
 };
 
+// form.elements permite acceder a los controles por su atributo name.
+// modalidad devuelve un RadioNodeList porque comparte name con dos radios.
 const controles = {
   nombre: elementos.formulario.elements.namedItem("nombre"),
   email: elementos.formulario.elements.namedItem("email"),
@@ -54,6 +58,7 @@ const controles = {
   aceptacion: elementos.formulario.elements.namedItem("aceptacion")
 };
 
+// Cada mensaje está asociado en HTML al control mediante aria-describedby.
 const mensajesError = {
   nombre: document.querySelector("#nombre-error"),
   email: document.querySelector("#email-error"),
@@ -64,10 +69,12 @@ const mensajesError = {
   aceptacion: document.querySelector("#aceptacion-error")
 };
 
+// map obtiene categorías y Set elimina las repetidas antes de ordenar el filtro.
 function obtenerCategorias() {
   return [...new Set(catalogo.map((producto) => producto.categoria))].sort();
 }
 
+// Las opciones de categoría se crean al arrancar a partir del propio catálogo.
 function prepararFiltroCategorias() {
   obtenerCategorias().forEach((categoria) => {
     const opcion = document.createElement("option");
@@ -77,6 +84,7 @@ function prepararFiltroCategorias() {
   });
 }
 
+// Búsqueda y categoría se aplican a la vez sobre el mismo array filtrado.
 function actualizarCatalogo() {
   const termino = elementos.busqueda.value.trim().toLocaleLowerCase("es");
   const categoria = elementos.filtroCategoria.value;
@@ -92,6 +100,7 @@ function actualizarCatalogo() {
   }`;
 }
 
+// Agrupa todos los importes en un objeto antes de repintar el carrito.
 function obtenerImportesCarrito() {
   const subtotal = calcularSubtotal(carrito, catalogo);
   const descuento = calcularDescuento(subtotal);
@@ -104,17 +113,20 @@ function obtenerImportesCarrito() {
   };
 }
 
+// Esta función sí toca el DOM; por eso los cálculos se mantienen separados arriba.
 function actualizarCarrito() {
   pintarCarrito(elementos.carrito, carrito, catalogo, obtenerImportesCarrito());
   elementos.confirmarPedido.disabled = carrito.length === 0;
 }
 
+// Los errores generales informan de un problema que no pertenece a un único campo.
 function mostrarErrorGeneral(texto) {
   elementos.errorPedido.textContent = texto;
   elementos.errorPedido.hidden = false;
   elementos.mensajePedido.hidden = true;
 }
 
+// Se limpian avisos viejos antes de iniciar una nueva acción del usuario.
 function limpiarAvisosGenerales() {
   elementos.errorPedido.hidden = true;
   elementos.errorPedido.textContent = "";
@@ -122,6 +134,7 @@ function limpiarAvisosGenerales() {
   elementos.mensajePedido.textContent = "";
 }
 
+// value.trim() detecta el valor vacío antes de valueAsNumber, que sí puede devolver NaN.
 function validarCantidad(cantidadEntrada, producto) {
   if (cantidadEntrada.value.trim() === "") {
     return "Indica una cantidad.";
@@ -139,7 +152,9 @@ function validarCantidad(cantidadEntrada, producto) {
   return "";
 }
 
+// El submit burbujea desde cada tarjeta hasta el contenedor común del catálogo.
 function anadirAlCarrito(event) {
+  // preventDefault evita que el formulario dinámico recargue la página.
   event.preventDefault();
   const formulario = event.target.closest(".form-anadir");
   const boton = event.target.closest('[data-action="anadir"]');
@@ -149,6 +164,7 @@ function anadirAlCarrito(event) {
   }
 
   limpiarAvisosGenerales();
+  // dataset contiene siempre texto, así que Number realiza la conversión explícita.
   const productoId = Number(formulario.dataset.productoId);
   const producto = catalogo.find((item) => item.id === productoId);
   const campoCantidad = formulario.elements.namedItem("cantidad");
@@ -185,17 +201,21 @@ function anadirAlCarrito(event) {
   }
 
   actualizarCarrito();
+  // Tras añadir se restaura el valor inicial para repetir la operación cómodamente.
   campoCantidad.value = "1";
   campoCantidad.setCustomValidity("");
 }
 
+// Delegación: existe un único listener para botones que se crean o sustituyen al repintar.
 function retirarDelCarrito(event) {
+  // event.target puede ser el texto visual o el botón; closest localiza el control.
   const boton = event.target.closest('[data-action="retirar"]');
   if (!boton || !elementos.carrito.lineas.contains(boton)) {
     return;
   }
 
   const productoId = Number(boton.dataset.productoId);
+  // findIndex devuelve la posición porque splice necesita precisamente un índice.
   const indice = carrito.findIndex((linea) => linea.productoId === productoId);
   if (indice !== -1) {
     carrito.splice(indice, 1);
@@ -203,10 +223,12 @@ function retirarDelCarrito(event) {
   }
 }
 
+// Borra tanto el texto mostrado como el error interno de Constraint Validation.
 function limpiarErroresFormulario() {
   Object.entries(mensajesError).forEach(([nombre, mensaje]) => {
     mensaje.textContent = "";
     const control = controles[nombre];
+    // Un RadioNodeList debe tratarse como conjunto de radios, no como un único input.
     if (control instanceof RadioNodeList) {
       Array.from(control).forEach((radio) => {
         radio.removeAttribute("aria-invalid");
@@ -219,6 +241,7 @@ function limpiarErroresFormulario() {
   });
 }
 
+// Asocia el mismo error al elemento visual y al mensaje nativo del navegador.
 function establecerErrorControl(nombre, mensaje) {
   const control = controles[nombre];
   mensajesError[nombre].textContent = mensaje;
@@ -235,6 +258,7 @@ function establecerErrorControl(nombre, mensaje) {
   control.setCustomValidity(mensaje);
 }
 
+// Durante la edición se borra el error anterior para que pueda corregirse de verdad.
 function validarControlDuranteEdicion(control) {
   const nombre = control.name;
   if (!(nombre in mensajesError) || nombre === "modalidad") {
@@ -246,6 +270,7 @@ function validarControlDuranteEdicion(control) {
   mensajesError[nombre].textContent = "";
 
   if (control.validity.valueMissing) {
+    // El campo vacío se exige, pero se avisa al usuario con el submit completo.
     return;
   }
 
@@ -256,6 +281,7 @@ function validarControlDuranteEdicion(control) {
   }
 }
 
+// Cambiar a recogida desactiva los campos postales y elimina sus posibles errores.
 function actualizarModalidad() {
   const esEnvio = controles.modalidad.value === "envio";
 
@@ -272,6 +298,7 @@ function actualizarModalidad() {
   mensajesError.codigoPostal.textContent = "";
 }
 
+// FormData refleja names del formulario, y checked conserva correctamente un booleano.
 function obtenerDatosFormulario() {
   const datos = new FormData(elementos.formulario);
   const modalidad = datos.get("modalidad") ?? "";
@@ -289,6 +316,7 @@ function obtenerDatosFormulario() {
   };
 }
 
+// every termina en false en cuanto encuentra una línea con producto o stock incorrectos.
 function comprobarStockCarrito() {
   // Se comprueba todo el carrito antes de tocar el stock o crear el pedido.
   return carrito.every((linea) => {
@@ -297,6 +325,7 @@ function comprobarStockCarrito() {
   });
 }
 
+// Crea la instantánea económica que quedará guardada aunque cambie el catálogo después.
 function crearPedido(datos, importes) {
   const fecha = new Date();
   // El pedido guarda valores, no referencias al catálogo, para conservar el precio.
@@ -318,6 +347,7 @@ function crearPedido(datos, importes) {
       dateStyle: "short",
       timeStyle: "short"
     }).format(fecha),
+    // Se copia el objeto del cliente para no depender de los controles del formulario.
     cliente: { ...datos },
     modalidad: datos.modalidad,
     lineas,
@@ -327,6 +357,7 @@ function crearPedido(datos, importes) {
   };
 }
 
+// Submit es el único punto que puede confirmar: siempre vuelve a validar todo.
 function confirmarPedido(event) {
   event.preventDefault();
   limpiarAvisosGenerales();
@@ -338,13 +369,16 @@ function confirmarPedido(event) {
   }
 
   const datos = obtenerDatosFormulario();
+  // La función pura decide los errores sin acceder todavía a ningún elemento del DOM.
   const errores = validarDatosPedido(datos);
 
+  // entries permite relacionar cada nombre de error con su control correspondiente.
   Object.entries(errores).forEach(([nombre, mensaje]) => {
     establecerErrorControl(nombre, mensaje);
   });
 
   if (Object.keys(errores).length > 0) {
+    // checkValidity comprueba restricciones HTML5; reportValidity muestra el primer error.
     if (!elementos.formulario.checkValidity()) {
       elementos.formulario.reportValidity();
     }
@@ -360,8 +394,10 @@ function confirmarPedido(event) {
   }
 
   const importes = obtenerImportesCarrito();
+  // La instantánea se crea antes de descontar, con todos los precios actuales.
   const pedido = crearPedido(datos, importes);
 
+  // Esta es la primera modificación del catálogo; hasta aquí solo se realizaron comprobaciones.
   carrito.forEach((linea) => {
     const producto = catalogo.find((item) => item.id === linea.productoId);
     producto.descontarStock(linea.cantidad);
@@ -384,6 +420,7 @@ function confirmarPedido(event) {
   elementos.mensajePedido.hidden = false;
 }
 
+// El resumen y la lista del historial se calculan con los pedidos ya filtrados.
 function actualizarHistorial() {
   const filtro = elementos.filtroHistorial.value;
   const filtrados = pedidos.filter(
@@ -392,6 +429,7 @@ function actualizarHistorial() {
   pintarHistorial(elementos.historial, filtrados);
 }
 
+// JSON.stringify serializa datos JavaScript; el tercer parámetro aplica indentación legible.
 function exportarHistorial() {
   if (pedidos.length === 0) {
     elementos.json.value = "[]";
@@ -403,6 +441,7 @@ function exportarHistorial() {
   elementos.json.focus();
 }
 
+// La API del portapapeles requiere HTTPS o localhost, condiciones propias del servidor local.
 async function copiarHistorial() {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(elementos.json.value);
@@ -413,15 +452,18 @@ async function copiarHistorial() {
     return;
   }
 
+  // La ruta alternativa mantiene la exportación utilizable en navegadores antiguos.
   elementos.json.select();
   document.execCommand("copy");
 }
 
+// Eventos del catálogo, carrito e historial.
 elementos.busqueda.addEventListener("input", actualizarCatalogo);
 elementos.filtroCategoria.addEventListener("change", actualizarCatalogo);
 elementos.catalogo.addEventListener("submit", anadirAlCarrito);
 elementos.carrito.lineas.addEventListener("click", retirarDelCarrito);
 elementos.formulario.addEventListener("submit", confirmarPedido);
+// input sirve para actualizar el contador y borrar errores mientras el usuario corrige.
 elementos.formulario.addEventListener("input", (event) => {
   const control = event.target;
   if (control === controles.observaciones) {
@@ -429,6 +471,7 @@ elementos.formulario.addEventListener("input", (event) => {
   }
   validarControlDuranteEdicion(control);
 });
+// change es apropiado para radios y checkbox, que cambian por selección.
 elementos.formulario.addEventListener("change", (event) => {
   if (event.target.name === "modalidad") {
     actualizarModalidad();
@@ -445,12 +488,14 @@ elementos.filtroHistorial.addEventListener("change", actualizarHistorial);
 elementos.exportar.addEventListener("click", exportarHistorial);
 elementos.copiarJson.addEventListener("click", copiarHistorial);
 
+// Estado inicial: no se espera a una interacción para pintar catálogo, carrito e historial.
 prepararFiltroCategorias();
 actualizarModalidad();
 actualizarCatalogo();
 actualizarCarrito();
 actualizarHistorial();
 
+// Estas referencias facilitan las pruebas de cálculo solicitadas en la consola.
 window.gestorPedidos = {
   calcularSubtotal: () => calcularSubtotal(carrito, catalogo),
   calcularDescuento,

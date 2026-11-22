@@ -1,14 +1,17 @@
+// Intl.NumberFormat convierte números a un formato de moneda español al final de los cálculos.
 const formatoMoneda = new Intl.NumberFormat("es-ES", {
   style: "currency",
   currency: "EUR",
   minimumFractionDigits: 2
 });
 
+// Si llega un valor no calculable se enseña cero, nunca NaN o Infinity.
 export function formatearMoneda(importe) {
   const importeSeguro = Number.isFinite(importe) ? importe : 0;
   return formatoMoneda.format(importeSeguro);
 }
 
+// Pequeño ayudante para evitar repetir createElement, className y textContent.
 function crearElemento(etiqueta, clase, texto) {
   const elemento = document.createElement(etiqueta);
 
@@ -23,6 +26,7 @@ function crearElemento(etiqueta, clase, texto) {
   return elemento;
 }
 
+// Crea una tarjeta completa de forma segura. El texto nunca se interpreta como HTML.
 export function crearTarjetaProducto(producto) {
   const tarjeta = crearElemento("article", "tarjeta-producto");
   const stock = crearElemento(
@@ -44,6 +48,7 @@ export function crearTarjetaProducto(producto) {
     producto.stock > 0 ? "Añadir" : "Sin stock"
   );
 
+  // Los atributos HTML5 ayudan al usuario, aunque JavaScript volverá a comprobarlos.
   etiqueta.htmlFor = cantidadId;
   cantidad.id = cantidadId;
   cantidad.name = "cantidad";
@@ -60,6 +65,7 @@ export function crearTarjetaProducto(producto) {
   boton.dataset.productoId = String(producto.id);
   boton.disabled = producto.stock === 0;
 
+  // data-producto-id permite recuperar el producto desde la tarjeta al gestionar el evento.
   formulario.dataset.productoId = String(producto.id);
   campoCantidad.append(etiqueta, cantidad);
   formulario.append(campoCantidad, boton);
@@ -68,7 +74,9 @@ export function crearTarjetaProducto(producto) {
   return tarjeta;
 }
 
+// Repinta el catálogo filtrado y muestra de forma explícita el estado sin resultados.
 export function pintarCatalogo(contenedor, estado, productos) {
+  // DocumentFragment reúne nodos sin repintar la página por cada tarjeta.
   const fragmento = document.createDocumentFragment();
 
   productos.forEach((producto) => fragmento.append(crearTarjetaProducto(producto)));
@@ -81,10 +89,12 @@ export function pintarCatalogo(contenedor, estado, productos) {
       : "";
 }
 
+// Recibe las referencias del DOM, las líneas y los importes ya calculados.
 export function pintarCarrito(elementos, lineas, catalogo, importes) {
   const fragmento = document.createDocumentFragment();
 
   lineas.forEach((linea) => {
+    // Las líneas guardan id y cantidad; el nombre y el precio siguen estando en el catálogo.
     const producto = catalogo.find((item) => item.id === linea.productoId);
     if (!producto) {
       return;
@@ -102,6 +112,7 @@ export function pintarCarrito(elementos, lineas, catalogo, importes) {
       )}`
     );
 
+    // dataset identifica qué línea retirar sin usar la posición visual como dato.
     retirar.type = "button";
     retirar.dataset.action = "retirar";
     retirar.dataset.productoId = String(producto.id);
@@ -111,6 +122,7 @@ export function pintarCarrito(elementos, lineas, catalogo, importes) {
     fragmento.append(articulo);
   });
 
+  // replaceChildren elimina de una sola vez el contenido anterior antes de pintar el nuevo.
   elementos.lineas.replaceChildren(fragmento);
   elementos.estado.hidden = lineas.length > 0;
   elementos.estado.textContent =
@@ -123,6 +135,7 @@ export function pintarCarrito(elementos, lineas, catalogo, importes) {
   elementos.total.textContent = formatearMoneda(importes.total);
 }
 
+// El historial muestra solo el array que ya fue filtrado en app.js.
 export function pintarHistorial(elementos, pedidosFiltrados) {
   // Un filtro puede dejar cero resultados; se calcula la suma sobre la copia filtrada.
   const fragmento = document.createDocumentFragment();
@@ -139,6 +152,7 @@ export function pintarHistorial(elementos, pedidosFiltrados) {
       } · ${formatearMoneda(pedido.total)}`
     );
     const detalle = document.createElement("details");
+    // details y summary permiten desplegar líneas sin JavaScript ni eventos extra.
     const resumen = crearElemento("summary", "", "Ver detalle");
     const lista = document.createElement("ul");
 

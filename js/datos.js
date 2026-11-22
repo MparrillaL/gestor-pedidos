@@ -1,5 +1,7 @@
 import { Producto } from "./productos.js";
 
+// Los datos sin procesar sirven únicamente de entrada para construir el catálogo.
+// Los identificadores no son consecutivos: así se demuestra que no son posiciones.
 const datosProductos = [
   { id: 101, nombre: "Ratón USB", categoria: "perifericos", precio: 12.5, stock: 8 },
   { id: 315, nombre: "Teclado inalámbrico", categoria: "perifericos", precio: 24.9, stock: 0 },
@@ -11,11 +13,13 @@ const datosProductos = [
   { id: 891, nombre: "Regleta USB-C", categoria: "accesorios", precio: 58.0, stock: 6 }
 ];
 
+// map recorre los datos y devuelve una instancia de Producto por cada objeto.
 export const catalogo = datosProductos.map(
   ({ id, nombre, categoria, precio, stock }) =>
     new Producto(id, nombre, categoria, precio, stock)
 );
 
 // Estas colecciones viven solo en memoria. Al recargar se crea una sesión nueva.
+// Se exportan como constantes porque siempre cambia su contenido, no su referencia.
 export const carrito = [];
 export const pedidos = [];

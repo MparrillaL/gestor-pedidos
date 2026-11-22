@@ -9,9 +9,11 @@
     />
     <title>Gestor de pedidos de material</title>
     <link rel="stylesheet" href="css/estilos.css" />
+    <!-- defer espera a que exista el DOM; type="module" permite usar imports y exports. -->
     <script src="js/app.js" defer type="module"></script>
   </head>
   <body>
+    <!-- La cabecera es estática; el contenido dinámico se inserta dentro de cada sección. -->
     <header class="cabecera">
       <div class="contenedor">
         <p class="eyebrow">Desarrollo Web en Entorno Cliente</p>
@@ -21,6 +23,7 @@
     </header>
 
     <main class="contenedor distribucion">
+      <!-- Los filtros combinan búsqueda por nombre y categoría sin reconstruir el array original. -->
       <section class="panel panel-catalogo" aria-labelledby="titulo-catalogo">
         <div class="encabezado-seccion">
           <div>
@@ -52,6 +55,7 @@
         <div class="rejilla-productos" id="catalogo"></div>
       </section>
 
+      <!-- El contenedor de líneas será el punto común para delegar el botón de retirada. -->
       <aside class="panel panel-carrito" aria-labelledby="titulo-carrito">
         <div class="encabezado-seccion">
           <div>
@@ -80,6 +84,7 @@
         </dl>
       </aside>
 
+      <!-- novalidate no elimina las restricciones: deja a JavaScript coordinar el envío. -->
       <section class="panel panel-pedido" aria-labelledby="titulo-pedido">
         <div class="encabezado-seccion">
           <div>
@@ -118,6 +123,7 @@
             <small class="error-campo" id="email-error"></small>
           </div>
 
+          <!-- fieldset y legend agrupan semánticamente los radios excluyentes. -->
           <fieldset class="campo-completo">
             <legend>Modalidad de entrega</legend>
             <div class="opciones-radio">
@@ -133,6 +139,7 @@
             <small class="error-campo" id="modalidad-error"></small>
           </fieldset>
 
+          <!-- Estos campos se habilitan solo al elegir envío y se excluyen al serializar recogida. -->
           <div id="campos-envio" class="campos-envio campo-completo" hidden>
             <div class="campo">
               <label for="direccion">Dirección de envío</label>
@@ -205,6 +212,7 @@
         </form>
       </section>
 
+      <!-- El detalle de cada pedido se pinta como un elemento desplegable accesible. -->
       <section class="panel panel-historial" aria-labelledby="titulo-historial">
         <div class="encabezado-seccion">
           <div>
