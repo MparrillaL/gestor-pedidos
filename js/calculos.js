@@ -1,8 +1,14 @@
+// Redondea a céntimos sin convertir a texto: sigue siendo un número para seguir operando.
+// Evita que sumas como 149.99 * 0.1 arrastren ruido de coma flotante (p. ej. 14.999000000000002).
+function redondearACentimos(importe) {
+  return Math.round(importe * 100) / 100;
+}
+
 // Estas funciones solo reciben datos y devuelven números u objetos. No conocen el DOM.
 // Gracias a ello pueden probarse desde la consola sin depender de botones o etiquetas.
 // El subtotal localiza cada producto por id; la posición en el array sería insegura.
 export function calcularSubtotal(lineas, catalogo) {
-  return lineas.reduce((acumulado, linea) => {
+  const subtotal = lineas.reduce((acumulado, linea) => {
     const producto = catalogo.find((item) => item.id === linea.productoId);
 
     if (!producto || !Number.isFinite(linea.cantidad) || linea.cantidad <= 0) {
@@ -11,6 +17,8 @@ export function calcularSubtotal(lineas, catalogo) {
 
     return acumulado + producto.precio * linea.cantidad;
   }, 0);
+
+  return redondearACentimos(subtotal);
 }
 
 // El 10 es un parámetro por defecto: puede omitirse, pero también permite probar otros porcentajes.
@@ -19,8 +27,8 @@ export function calcularDescuento(subtotal, porcentaje = 10) {
     throw new TypeError("Los valores para calcular el descuento no son válidos.");
   }
 
-  // El descuento se calcula con números. El redondeo visual se hace después.
-  return subtotal >= 100 ? subtotal * (porcentaje / 100) : 0;
+  // El descuento se redondea aquí porque es el último paso antes de guardarlo en el pedido.
+  return subtotal >= 100 ? redondearACentimos(subtotal * (porcentaje / 100)) : 0;
 }
 
 // Esta función mantiene por separado el cálculo final y facilita detectar importes incoherentes.
@@ -35,7 +43,7 @@ export function calcularTotal(subtotal, descuento) {
     throw new TypeError("Los importes del pedido no son válidos.");
   }
 
-  return subtotal - descuento;
+  return redondearACentimos(subtotal - descuento);
 }
 
 // Devuelve un objeto con errores. No muestra mensajes ni cambia ningún control del formulario.

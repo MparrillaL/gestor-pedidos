@@ -157,9 +157,10 @@ function anadirAlCarrito(event) {
   // preventDefault evita que el formulario dinámico recargue la página.
   event.preventDefault();
   const formulario = event.target.closest(".form-anadir");
-  const boton = event.target.closest('[data-action="anadir"]');
+  // En submit, target es el formulario y submitter es el botón que lo disparó.
+  const boton = event.submitter;
 
-  if (!formulario || !boton) {
+  if (!formulario || !boton || boton.dataset.action !== "anadir") {
     return;
   }
 
