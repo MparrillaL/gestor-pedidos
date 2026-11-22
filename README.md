@@ -232,6 +232,9 @@ Esta comprobación evidencia que los módulos y el CSS se cargan desde el
 servidor HTTP local (no mediante `file://`) y permite detectar errores 404 o
 ficheros que no llegan a cargarse.
 
+Enlace de la conversación con la IA:
+https://claude.ai/share/849427b8-45e2-43db-aba4-449aee140177
+
 ## Preguntas útiles para la defensa
 
 - ¿Por qué `file://` no permite organizar cómodamente módulos y debe usarse HTTP?
